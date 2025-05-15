@@ -28,7 +28,9 @@ const LeftPanel = ({ onItemSelect, contentItems }) => {
 
   useEffect(() => {
     setItems(contentItems);
-  }, []);
+  },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  []);
 
   useEffect(() => {
     if (itemRefs.current[selectedIndex]) {
@@ -39,31 +41,69 @@ const LeftPanel = ({ onItemSelect, contentItems }) => {
     }
   }, [selectedIndex]);
 
+  useEffect(() => {
+  if (items[selectedIndex]) {
+    onItemSelect(items[selectedIndex].title);
+  }
+}, [selectedIndex, items]);
+
+
+
+
   const handleListItemClick = (index) => {
     setSelectedIndex(index);
     onItemSelect(items[index].title);
   };
 
-  const scrollList = (direction) => {
+//   const scrollList = (direction) => {
+//   setItems((prevItems) => {
+//     const newItems = [...prevItems];
+//     const currentIndex = selectedIndex;
+//     const targetIndex =
+//       direction === 'up'
+//         ? Math.max(currentIndex - 1, 0)
+//         : Math.min(currentIndex + 1, newItems.length - 1);
+
+//     // If no movement needed, return as-is
+//     if (currentIndex === targetIndex) return prevItems;
+
+//     // Swap items
+//     const temp = newItems[currentIndex];
+//     newItems[currentIndex] = newItems[targetIndex];
+//     newItems[targetIndex] = temp;
+
+//     // Update selectedIndex and notify parent
+//     setSelectedIndex(targetIndex);
+//     onItemSelect(newItems[targetIndex].title);
+
+//     return newItems;
+//   });
+// };
+
+
+const scrollList = (direction) => {
   setItems((prevItems) => {
     const newItems = [...prevItems];
-    const currentIndex = selectedIndex;
+
+    // Get the current index based on selected item title (to ensure accuracy)
+    const currentIndex = newItems.findIndex(item => item.title === items[selectedIndex]?.title);
+    if (currentIndex === -1) return prevItems;
+
     const targetIndex =
       direction === 'up'
         ? Math.max(currentIndex - 1, 0)
         : Math.min(currentIndex + 1, newItems.length - 1);
 
-    // If no movement needed, return as-is
     if (currentIndex === targetIndex) return prevItems;
 
-    // Swap items
-    const temp = newItems[currentIndex];
-    newItems[currentIndex] = newItems[targetIndex];
-    newItems[targetIndex] = temp;
+    // Swap
+    [newItems[currentIndex], newItems[targetIndex]] = [newItems[targetIndex], newItems[currentIndex]];
 
-    // Update selectedIndex and notify parent
-    setSelectedIndex(targetIndex);
-    onItemSelect(newItems[targetIndex].title);
+    // Defer the update to selectedIndex and notify parent after setItems
+    setTimeout(() => {
+      setSelectedIndex(targetIndex);
+      onItemSelect(newItems[targetIndex].title);
+    }, 0);
 
     return newItems;
   });
