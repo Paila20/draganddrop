@@ -28,7 +28,7 @@ const LeftPanel = ({ onItemSelect, contentItems }) => {
 
   useEffect(() => {
     setItems(contentItems);
-  }, [contentItems]);
+  }, []);
 
   useEffect(() => {
     if (itemRefs.current[selectedIndex]) {
